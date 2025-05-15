@@ -13,7 +13,6 @@ import uz.alifservice.dto.communication.sms.SmsAuthDTO;
 import uz.alifservice.dto.communication.sms.SmsAuthResponseDTO;
 import uz.alifservice.dto.communication.sms.SmsRequestDTO;
 import uz.alifservice.dto.communication.sms.SmsSendResponseDTO;
-import uz.alifservice.enums.AppLanguage;
 import uz.alifservice.enums.SmsType;
 import uz.alifservice.exps.AppBadException;
 import uz.alifservice.repository.communication.sms.SmsProviderTokenHolderRepository;
@@ -41,28 +40,27 @@ public class SmsSendService {
     @Value("${sms.limit}")
     private Integer smsLimit;
 
-    public void sendRegistrationSms(String phoneNumber, SmsType smsType, AppLanguage lang) {
+    public void sendRegistrationSms(String phoneNumber, SmsType smsType) {
         String code = RandomUtil.getRandomSmsCode();
         System.out.println(code);
         // test uchun ishlatilyapdi
         String message = "";
         switch (smsType) {
-            case SmsType.REGISTRATION -> message = bundleService.getMessage("sms.registration.confirm.code", lang);
-            case SmsType.RESET_PASSWORD -> message = bundleService.getMessage("sms.reset.password.confirm", lang);
-            case SmsType.CHANGE_USERNAME_CONFIRM ->
-                    message = bundleService.getMessage("sms.change.username.confirm", lang);
+            case SmsType.REGISTRATION -> message = bundleService.getMessage("sms.registration.confirm.code");
+            case SmsType.RESET_PASSWORD -> message = bundleService.getMessage("sms.reset.password.confirm");
+            case SmsType.CHANGE_USERNAME_CONFIRM -> message = bundleService.getMessage("sms.change.username.confirm");
         }
 //        String message = "Ro'yxatdan o'tish uchun tasdiqlash codi (code) : %s";
 //        message = String.format(message,code);
-        sendSms(phoneNumber, message, code, smsType, lang);
+        sendSms(phoneNumber, message, code, smsType);
     }
 
-    private SmsSendResponseDTO sendSms(String phoneNumber, String message, String code, SmsType smsType, AppLanguage lang) {
+    private SmsSendResponseDTO sendSms(String phoneNumber, String message, String code, SmsType smsType) {
         // check
         Long count = smsHistoryService.getSmsCount(phoneNumber);
         if (count >= smsLimit) {
             System.out.println("---- Sms Limit Reached. Phone : " + phoneNumber);
-            throw new AppBadException(bundleService.getMessage("sms.limit.reached", lang));
+            throw new AppBadException(bundleService.getMessage("sms.limit.reached"));
         }
 
         SmsSendResponseDTO result = sendSms(phoneNumber, message);

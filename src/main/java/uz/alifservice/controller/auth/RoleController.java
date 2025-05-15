@@ -12,7 +12,6 @@ import uz.alifservice.domain.auth.Role;
 import uz.alifservice.dto.AppResponse;
 import uz.alifservice.dto.auth.role.RoleCrudDto;
 import uz.alifservice.dto.auth.role.RoleDto;
-import uz.alifservice.enums.AppLanguage;
 import uz.alifservice.mapper.auth.RoleMapper;
 import uz.alifservice.service.auth.RoleService;
 import uz.alifservice.service.message.ResourceBundleService;
@@ -29,58 +28,41 @@ public class RoleController implements GenericCrudController<RoleDto, RoleCrudDt
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/roles/{id}", method = RequestMethod.GET)
-    public ResponseEntity<AppResponse<RoleDto>> get(
-            @PathVariable(value = "id") Long id,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved", lang);
-        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.get(id, lang)), messsage));
+    public ResponseEntity<AppResponse<RoleDto>> get(@PathVariable(value = "id") Long id) {
+        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.get(id)), messsage));
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/roles", method = RequestMethod.GET)
-    public ResponseEntity<AppResponse<Page<RoleDto>>> list(
-            RoleCriteria criteria,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved", lang);
-        return ResponseEntity.ok(AppResponse.success(service.list(criteria, lang).map(mapper::toDto), messsage));
+    public ResponseEntity<AppResponse<Page<RoleDto>>> list(RoleCriteria criteria) {
+        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(service.list(criteria).map(mapper::toDto), messsage));
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/roles", method = RequestMethod.POST)
-    public ResponseEntity<AppResponse<RoleDto>> create(
-            @RequestBody RoleCrudDto dto,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("created", lang);
-        return new ResponseEntity<>(AppResponse.success(mapper.toDto(service.create(dto, lang)), messsage), HttpStatus.CREATED);
+    public ResponseEntity<AppResponse<RoleDto>> create(@RequestBody RoleCrudDto dto) {
+        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("created");
+        return new ResponseEntity<>(AppResponse.success(mapper.toDto(service.create(dto)), messsage), HttpStatus.CREATED);
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/roles/{id}", method = {RequestMethod.PUT, RequestMethod.POST})
-    public ResponseEntity<AppResponse<RoleDto>> edit(
-            @PathVariable(
-                    value = "id") Long id,
-            @RequestBody RoleCrudDto dto,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("updated", lang);
-        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.update(id, dto, lang)), messsage));
+    public ResponseEntity<AppResponse<RoleDto>> edit(@PathVariable(value = "id") Long id, @RequestBody RoleCrudDto dto) {
+        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("updated");
+        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.update(id, dto)), messsage));
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/roles/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<AppResponse<Boolean>> delete(
-            @PathVariable(value = "id") Long id,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        service.delete(id, lang);
-        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("deleted", lang);
+    public ResponseEntity<AppResponse<Boolean>> delete(@PathVariable(value = "id") Long id) {
+        service.delete(id);
+        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("deleted");
         return ResponseEntity.ok(AppResponse.success(true, messsage));
     }
 }

@@ -12,7 +12,6 @@ import uz.alifservice.domain.debt.Debt;
 import uz.alifservice.dto.debt.DebtCrudDto;
 import uz.alifservice.dto.debt.DebtDto;
 import uz.alifservice.dto.debt.DebtTransactionCrudDto;
-import uz.alifservice.enums.AppLanguage;
 import uz.alifservice.enums.DebtAction;
 import uz.alifservice.enums.DebtRole;
 import uz.alifservice.mapper.debt.DebtMapper;
@@ -31,20 +30,20 @@ public class DebtService implements GenericCrudService<Debt, DebtCrudDto, DebtCr
 
     @Override
     @Transactional(readOnly = true)
-    public Debt get(Long id, AppLanguage lang) {
+    public Debt get(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.valueOf(id)));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Debt> list(DebtCriteria criteria, AppLanguage lang) {
+    public Page<Debt> list(DebtCriteria criteria) {
         return repository.findAll(criteria.toSpecification(),
                 PageRequest.of(criteria.getPage(), criteria.getSize(), Sort.by(criteria.getDirection(), criteria.getSort())));
     }
 
     @Override
     @Transactional
-    public Debt create(DebtCrudDto dto, AppLanguage lang) {
+    public Debt create(DebtCrudDto dto) {
         Debt debtEntity = repository.save(mapper.fromCreateDto(dto));
         DebtDto debtDto = mapper.toDto(debtEntity);
 
@@ -53,35 +52,35 @@ public class DebtService implements GenericCrudService<Debt, DebtCrudDto, DebtCr
         transactionCrudDto.setAmount(dto.getTotalAmount());
         transactionCrudDto.setDescription(dto.getDescription());
         transactionCrudDto.setFileHash(dto.getFileHash());
-        if(dto.getDebtRole() == DebtRole.LEND){
+        if (dto.getDebtRole() == DebtRole.LEND) {
             transactionCrudDto.setAction(DebtAction.GAVE);
-        }else if(dto.getDebtRole() == DebtRole.BORROW){
+        } else if (dto.getDebtRole() == DebtRole.BORROW) {
             transactionCrudDto.setAction(DebtAction.TOOK);
         }
         transactionCrudDto.setIssueDate(dto.getIssueDate());
         transactionCrudDto.setDueDate(dto.getDueDate());
-        debtTransactionService.createDebtTransaction(transactionCrudDto, lang);
+        debtTransactionService.createDebtTransaction(transactionCrudDto);
 
         return debtEntity;
     }
 
     @Override
     @Transactional
-    public Debt update(Long id, DebtCrudDto dto, AppLanguage lang) {
-        Debt entity = get(id, lang);
+    public Debt update(Long id, DebtCrudDto dto) {
+        Debt entity = get(id);
         return repository.save(mapper.fromUpdate(dto, entity));
     }
 
     @Override
     @Transactional
-    public void delete(Long id, AppLanguage lang) {
-        Debt entity = get(id, lang);
+    public void delete(Long id) {
+        Debt entity = get(id);
         entity.setDeleted(true);
     }
 
     public Debt getDebtById(Long id) {
         Optional<Debt> optional = repository.findById(id);
-        if(optional.isEmpty()) throw new EntityNotFoundException(String.valueOf(id));
+        if (optional.isEmpty()) throw new EntityNotFoundException(String.valueOf(id));
         return optional.get();
     }
 }

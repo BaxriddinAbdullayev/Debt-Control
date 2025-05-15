@@ -8,7 +8,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import uz.alifservice.enums.AppLanguage;
 import uz.alifservice.enums.SmsType;
 import uz.alifservice.exps.AppBadException;
 import uz.alifservice.service.message.ResourceBundleService;
@@ -32,21 +31,21 @@ public class EmailSendingService {
     @Value("${email.limit}")
     private Integer emailLimit = 3;
 
-    public void sendRegistrationEmail(String email, SmsType smsType, AppLanguage lang) {
+    public void sendRegistrationEmail(String email, SmsType smsType) {
         String code = RandomUtil.getRandomSmsCode();
         String subject = "";
         String body = "";
         switch (smsType) {
             case SmsType.REGISTRATION -> {
-                subject = bundleService.getMessage("email.subject.resitration", lang);
-                body = bundleService.getMessage("confirm.code.message", lang) + " " + code;
+                subject = bundleService.getMessage("email.subject.resitration");
+                body = bundleService.getMessage("confirm.code.message") + " " + code;
             }
             case SmsType.RESET_PASSWORD -> {
-                subject = bundleService.getMessage("email.subject.reset.password", lang);
-                body = bundleService.getMessage("reset.password.code.message", lang) + " " + code;
+                subject = bundleService.getMessage("email.subject.reset.password");
+                body = bundleService.getMessage("reset.password.code.message") + " " + code;
             }
         }
-        checkAndSendMimeEmail(email, subject, body, code, smsType, lang);
+        checkAndSendMimeEmail(email, subject, body, code, smsType);
     }
 
     private void checkAndSendMimeEmail(
@@ -54,14 +53,13 @@ public class EmailSendingService {
             String subject,
             String body,
             String code,
-            SmsType smsType,
-            AppLanguage lang
+            SmsType smsType
     ) {
         // check
         Long count = emailHistoryService.getEmailCount(email);
         if (count >= emailLimit) {
             System.out.println(" ----- Email Limit Reached. Email: " + email);
-            throw new AppBadException(bundleService.getMessage("email.limit.reached", lang));
+            throw new AppBadException(bundleService.getMessage("email.limit.reached"));
         }
         // send
         sendMimeEmail(email, subject, body);

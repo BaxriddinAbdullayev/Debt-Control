@@ -12,7 +12,6 @@ import uz.alifservice.domain.currency.Currency;
 import uz.alifservice.dto.AppResponse;
 import uz.alifservice.dto.currency.CurrencyCrudDto;
 import uz.alifservice.dto.currency.CurrencyDto;
-import uz.alifservice.enums.AppLanguage;
 import uz.alifservice.mapper.currency.CurrencyMapper;
 import uz.alifservice.service.currency.CurrencyService;
 import uz.alifservice.service.message.ResourceBundleService;
@@ -29,58 +28,41 @@ public class CurrencyController implements GenericCrudController<CurrencyDto, Cu
     @Override
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @RequestMapping(value = "/currencies/{id}", method = RequestMethod.GET)
-    public ResponseEntity<AppResponse<CurrencyDto>> get(
-            @PathVariable(value = "id") Long id,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved", lang);
-        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.get(id, lang)), messsage));
+    public ResponseEntity<AppResponse<CurrencyDto>> get(@PathVariable(value = "id") Long id) {
+        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.get(id)), messsage));
     }
 
     @Override
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @RequestMapping(value = "/currencies", method = RequestMethod.GET)
-    public ResponseEntity<AppResponse<Page<CurrencyDto>>> list(
-            CurrencyCriteria criteria,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved", lang);
-        return ResponseEntity.ok(AppResponse.success(service.list(criteria, lang).map(mapper::toDto), messsage));
+    public ResponseEntity<AppResponse<Page<CurrencyDto>>> list(CurrencyCriteria criteria) {
+        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(service.list(criteria).map(mapper::toDto), messsage));
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/currencies", method = RequestMethod.POST)
-    public ResponseEntity<AppResponse<CurrencyDto>> create(
-            @RequestBody CurrencyCrudDto dto,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("created", lang);
-        return new ResponseEntity<>(AppResponse.success(mapper.toDto(service.create(dto, lang)), messsage), HttpStatus.CREATED);
+    public ResponseEntity<AppResponse<CurrencyDto>> create(@RequestBody CurrencyCrudDto dto) {
+        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("created");
+        return new ResponseEntity<>(AppResponse.success(mapper.toDto(service.create(dto)), messsage), HttpStatus.CREATED);
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/currencies/{id}", method = {RequestMethod.PUT, RequestMethod.POST})
-    public ResponseEntity<AppResponse<CurrencyDto>> edit(
-            @PathVariable(
-                    value = "id") Long id,
-            @RequestBody CurrencyCrudDto dto,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("updated", lang);
-        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.update(id, dto, lang)), messsage));
+    public ResponseEntity<AppResponse<CurrencyDto>> edit(@PathVariable(value = "id") Long id, @RequestBody CurrencyCrudDto dto) {
+        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("updated");
+        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.update(id, dto)), messsage));
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/currencies/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<AppResponse<Boolean>> delete(
-            @PathVariable(value = "id") Long id,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        service.delete(id, lang);
-        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("deleted", lang);
+    public ResponseEntity<AppResponse<Boolean>> delete(@PathVariable(value = "id") Long id) {
+        service.delete(id);
+        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("deleted");
         return ResponseEntity.ok(AppResponse.success(true, messsage));
     }
 }

@@ -11,7 +11,7 @@ public class AppLanguageArgumentResolver implements HandlerMethodArgumentResolve
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(AppLanguage.class);
+        return AppLanguage.class.isAssignableFrom(parameter.getParameterType());
     }
 
     @Override

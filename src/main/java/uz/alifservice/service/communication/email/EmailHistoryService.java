@@ -3,7 +3,6 @@ package uz.alifservice.service.communication.email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.alifservice.domain.communication.email.EmailHistory;
-import uz.alifservice.enums.AppLanguage;
 import uz.alifservice.enums.SmsType;
 import uz.alifservice.exps.AppBadException;
 import uz.alifservice.repository.communication.email.EmailHistoryRepository;
@@ -34,22 +33,22 @@ public class EmailHistoryService {
         return emailHistoryRepository.countByEmailAndCreatedAtBetween(email, now.minusMinutes(1), now);
     }
 
-    public void check(String email, String code, AppLanguage lang) {
+    public void check(String email, String code) {
         // find last sms by phoneNumber
         Optional<EmailHistory> optional = emailHistoryRepository.findTop1ByEmailOrderByCreatedAtDesc(email);
         if (optional.isEmpty()) {
-            throw new AppBadException(bundleService.getMessage("verification.failed", lang));
+            throw new AppBadException(bundleService.getMessage("verification.failed"));
         }
 
         EmailHistory entity = optional.get();
         //Attempt count
         if (entity.getAttemptCount() >= 3) {
-            throw new AppBadException(bundleService.getMessage("attempts.number.expired", lang));
+            throw new AppBadException(bundleService.getMessage("attempts.number.expired"));
         }
         // check code
         if (!entity.getCode().equals(code)) {
             emailHistoryRepository.updateAttemptCount(entity.getId()); // update attempt count ++
-            throw new AppBadException(bundleService.getMessage("invalid.code", lang));
+            throw new AppBadException(bundleService.getMessage("invalid.code"));
         }
 
         // check time
@@ -58,7 +57,7 @@ public class EmailHistoryService {
                 .toLocalDateTime()
                 .plusMinutes(2);
         if (LocalDateTime.now().isAfter(expDate)) { // not valid
-            throw new AppBadException(bundleService.getMessage("code.timed.out", lang));
+            throw new AppBadException(bundleService.getMessage("code.timed.out"));
         }
     }
 }

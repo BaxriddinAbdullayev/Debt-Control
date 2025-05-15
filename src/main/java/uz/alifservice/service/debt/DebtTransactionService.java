@@ -11,7 +11,6 @@ import uz.alifservice.criteria.debt.DebtTransactionCriteria;
 import uz.alifservice.domain.debt.Debt;
 import uz.alifservice.domain.debt.DebtTransaction;
 import uz.alifservice.dto.debt.DebtTransactionCrudDto;
-import uz.alifservice.enums.AppLanguage;
 import uz.alifservice.enums.DebtRole;
 import uz.alifservice.exps.AppBadException;
 import uz.alifservice.mapper.debt.DebtTransactionMapper;
@@ -36,20 +35,20 @@ public class DebtTransactionService implements GenericCrudService<DebtTransactio
 
     @Override
     @Transactional(readOnly = true)
-    public DebtTransaction get(Long id, AppLanguage lang) {
+    public DebtTransaction get(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.valueOf(id)));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<DebtTransaction> list(DebtTransactionCriteria criteria, AppLanguage lang) {
+    public Page<DebtTransaction> list(DebtTransactionCriteria criteria) {
         return repository.findAll(criteria.toSpecification(),
                 PageRequest.of(criteria.getPage(), criteria.getSize(), Sort.by(criteria.getDirection(), criteria.getSort())));
     }
 
     @Override
     @Transactional
-    public DebtTransaction create(DebtTransactionCrudDto dto, AppLanguage lang) {
+    public DebtTransaction create(DebtTransactionCrudDto dto) {
         Optional<Debt> optional = debtRepository.findById(dto.getDebt().getId());
         if (optional.isEmpty()) throw new EntityNotFoundException(String.valueOf(id));
 
@@ -96,7 +95,7 @@ public class DebtTransactionService implements GenericCrudService<DebtTransactio
                 calculateTotalAmount = debtEntity.getTotalAmount().add(dto.getAmount());
             }
             default -> {
-                throw new AppBadException(bundleService.getMessage("status.wrong", lang));
+                throw new AppBadException(bundleService.getMessage("status.wrong"));
             }
         }
 
@@ -107,19 +106,19 @@ public class DebtTransactionService implements GenericCrudService<DebtTransactio
 
     @Override
     @Transactional
-    public DebtTransaction update(Long id, DebtTransactionCrudDto dto, AppLanguage lang) {
-        DebtTransaction entity = get(id, lang);
+    public DebtTransaction update(Long id, DebtTransactionCrudDto dto) {
+        DebtTransaction entity = get(id);
         return repository.save(mapper.fromUpdate(dto, entity));
     }
 
     @Override
     @Transactional
-    public void delete(Long id, AppLanguage lang) {
-        DebtTransaction entity = get(id, lang);
+    public void delete(Long id) {
+        DebtTransaction entity = get(id);
         entity.setDeleted(true);
     }
 
-    public DebtTransaction createDebtTransaction(DebtTransactionCrudDto dto, AppLanguage lang) {
+    public DebtTransaction createDebtTransaction(DebtTransactionCrudDto dto) {
         return repository.save(mapper.fromCreateDto(dto));
     }
 }

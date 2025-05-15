@@ -10,12 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uz.alifservice.dto.AppResponse;
-import uz.alifservice.enums.AppLanguage;
 import uz.alifservice.exps.AppBadException;
 import uz.alifservice.service.message.ResourceBundleService;
 
@@ -36,26 +34,20 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request
     ) {
-        String headerLang = request.getHeader("Accept-Language");
-        AppLanguage lang = headerLang != null ? AppLanguage.valueOf(headerLang.toUpperCase()) : AppLanguage.UZ;
-
         List<String> errorFields = new ArrayList<>();
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errorFields.add(error.getField() + ": " + error.getDefaultMessage());
         }
         return new ResponseEntity<>(
-                AppResponse.error(bundleService.getMessage("fill.input", lang) + ": " + errorFields),
+                AppResponse.error(bundleService.getMessage("fill.input") + ": " + errorFields),
                 HttpStatus.BAD_REQUEST
         );
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<AppResponse<Object>> handleEntityNotFoundException(
-            EntityNotFoundException ex,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
+    public ResponseEntity<AppResponse<Object>> handleEntityNotFoundException(EntityNotFoundException ex) {
         return new ResponseEntity<>(
-                AppResponse.error(bundleService.getMessage("entity.not.found", lang) + " " + ex.getMessage()),
+                AppResponse.error(bundleService.getMessage("entity.not.found") + " " + ex.getMessage()),
                 HttpStatus.NOT_FOUND
         );
     }
@@ -66,13 +58,10 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<AppResponse<Object>> handleGeneralException(
-            RuntimeException ex,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
+    public ResponseEntity<AppResponse<Object>> handleGeneralException(RuntimeException ex) {
         ex.getStackTrace();
         return new ResponseEntity<>(
-                AppResponse.error(bundleService.getMessage("unexpected.error", lang)),
+                AppResponse.error(bundleService.getMessage("unexpected.error")),
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     }

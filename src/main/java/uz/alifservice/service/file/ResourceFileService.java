@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.alifservice.criteria.file.ResourceFileCriteria;
 import uz.alifservice.domain.file.ResourceFile;
-import uz.alifservice.enums.AppLanguage;
 import uz.alifservice.repository.file.ResourceFileRepository;
 import uz.alifservice.service.GenericService;
 
@@ -21,13 +20,13 @@ public class ResourceFileService implements GenericService<ResourceFile, Resourc
 
     @Override
     @Transactional(readOnly = true)
-    public ResourceFile get(Long id, AppLanguage lang) {
+    public ResourceFile get(Long id) {
         return repository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ResourceFile> list(ResourceFileCriteria criteria, AppLanguage lang) {
+    public Page<ResourceFile> list(ResourceFileCriteria criteria) {
         return repository.findAll(criteria.toSpecification(), PageRequest.of(criteria.getPage(), criteria.getSize(), Sort.by(criteria.getDirection(), criteria.getSort())));
     }
 }

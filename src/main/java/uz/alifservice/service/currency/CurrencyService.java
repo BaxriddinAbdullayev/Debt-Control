@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uz.alifservice.criteria.currency.CurrencyCriteria;
 import uz.alifservice.domain.currency.Currency;
 import uz.alifservice.dto.currency.CurrencyCrudDto;
-import uz.alifservice.enums.AppLanguage;
 import uz.alifservice.mapper.currency.CurrencyMapper;
 import uz.alifservice.repository.currency.CurrencyRepository;
 import uz.alifservice.service.GenericCrudService;
@@ -24,34 +23,34 @@ public class CurrencyService implements GenericCrudService<Currency, CurrencyCru
 
     @Override
     @Transactional(readOnly = true)
-    public Currency get(Long id, AppLanguage lang) {
+    public Currency get(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.valueOf(id)));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Currency> list(CurrencyCriteria criteria, AppLanguage lang) {
+    public Page<Currency> list(CurrencyCriteria criteria) {
         return repository.findAll(criteria.toSpecification(),
                 PageRequest.of(criteria.getPage(), criteria.getSize(), Sort.by(criteria.getDirection(), criteria.getSort())));
     }
 
     @Override
     @Transactional
-    public Currency create(CurrencyCrudDto dto, AppLanguage lang) {
+    public Currency create(CurrencyCrudDto dto) {
         return repository.save(mapper.fromCreateDto(dto));
     }
 
     @Override
     @Transactional
-    public Currency update(Long id, CurrencyCrudDto dto, AppLanguage lang) {
-        Currency entity = get(id, lang);
+    public Currency update(Long id, CurrencyCrudDto dto) {
+        Currency entity = get(id);
         return repository.save(mapper.fromUpdate(dto, entity));
     }
 
     @Override
     @Transactional
-    public void delete(Long id, AppLanguage lang) {
-        Currency entity = get(id, lang);
+    public void delete(Long id) {
+        Currency entity = get(id);
         entity.setDeleted(true);
     }
 }

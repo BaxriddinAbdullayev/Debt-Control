@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uz.alifservice.domain.communication.sms.SmsHistory;
-import uz.alifservice.enums.AppLanguage;
 import uz.alifservice.enums.SmsType;
 import uz.alifservice.exps.AppBadException;
 import uz.alifservice.repository.communication.sms.SmsHistoryRepository;
@@ -37,20 +36,20 @@ public class SmsHistoryService {
         return smsHistoryRepository.countByPhoneAndCreatedAtBetween(phone, now.minusMinutes(1), now);
     }
 
-    public void check(String phoneNumber, String code, AppLanguage lang) {
+    public void check(String phoneNumber, String code) {
         Optional<SmsHistory> optional = smsHistoryRepository.findTop1ByPhoneOrderByCreatedAtDesc(phoneNumber);
         if (optional.isEmpty()) {
-            throw new AppBadException(bundleService.getMessage("verification.failed", lang));
+            throw new AppBadException(bundleService.getMessage("verification.failed"));
         }
 
         SmsHistory entity = optional.get();
         if (entity.getAttemptCount() >= 3) {
-            throw new AppBadException(bundleService.getMessage("attempts.number.expired", lang));
+            throw new AppBadException(bundleService.getMessage("attempts.number.expired"));
         }
 
         if (!entity.getCode().equals(code)) {
             smsHistoryRepository.updateAttemptCount(entity.getId());
-            throw new AppBadException(bundleService.getMessage("invalid.code", lang));
+            throw new AppBadException(bundleService.getMessage("invalid.code"));
         }
 
         LocalDateTime expDate = entity.getCreatedAt().toInstant()
@@ -59,7 +58,7 @@ public class SmsHistoryService {
                 .plusMinutes(2);
 
         if (LocalDateTime.now().isAfter(expDate)) {
-            throw new AppBadException(bundleService.getMessage("code.timed.out", lang));
+            throw new AppBadException(bundleService.getMessage("code.timed.out"));
         }
     }
 }

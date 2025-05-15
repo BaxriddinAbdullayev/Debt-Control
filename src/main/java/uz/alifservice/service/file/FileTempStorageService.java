@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import uz.alifservice.domain.file.ResourceFile;
 import uz.alifservice.dto.AppResponse;
 import uz.alifservice.dto.file.ResourceFileDto;
-import uz.alifservice.enums.AppLanguage;
 import uz.alifservice.exps.AppBadException;
 import uz.alifservice.mapper.file.ResourceFileMapper;
 import uz.alifservice.repository.file.ResourceFileRepository;
@@ -44,9 +42,9 @@ public class FileTempStorageService {
     @Value("${resource.file.upload.url}")
     private String resourceFileUrl;
 
-    public AppResponse<ResourceFileDto> upload(MultipartFile file, AppLanguage lang) {
+    public AppResponse<ResourceFileDto> upload(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new AppBadException(bundleService.getMessage("empty.file", lang));
+            throw new AppBadException(bundleService.getMessage("empty.file"));
         }
 
         try {
@@ -78,15 +76,15 @@ public class FileTempStorageService {
             ResourceFileDto resourceFileDto = mapper.toDto(entity);
             resourceFileDto.setUrl(openURL(entity.getResourceHash()));
 
-            return AppResponse.success(resourceFileDto, bundleService.getMessage("success.upload", lang));
+            return AppResponse.success(resourceFileDto, bundleService.getMessage("success.upload"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return AppResponse.error(bundleService.getMessage("error.upload", lang));
+        return AppResponse.error(bundleService.getMessage("error.upload"));
     }
 
-    public Resource download(String resourceHash, AppLanguage lang) { // burger-king.jpg
-        ResourceFile entity = get(resourceHash, lang);
+    public Resource download(String resourceHash) { // burger-king.jpg
+        ResourceFile entity = get(resourceHash);
 
         Path file = Paths.get(folderName + "/" + entity.getPath() + "/" + resourceHash);
         // images / attaches / burger-king.jpg
@@ -103,14 +101,14 @@ public class FileTempStorageService {
         return null;
     }
 
-    public ResponseEntity<Resource> open(String resourceHash, AppLanguage lang) {
-        ResourceFile entity = get(resourceHash, lang);
+    public ResponseEntity<Resource> open(String resourceHash) {
+        ResourceFile entity = get(resourceHash);
         Path filePath = Paths.get(folderName + "/" + entity.getPath() + "/" + entity.getResourceHash()).normalize();
         Resource resource = null;
         try {
             resource = new UrlResource(filePath.toUri());
             if (!resource.exists()) {
-                throw new AppBadException(bundleService.getMessage("file.not.found", lang)+ " " + resourceHash);
+                throw new AppBadException(bundleService.getMessage("file.not.found") + " " + resourceHash);
             }
             String contentType = Files.probeContentType(filePath);
             if (contentType == null) {
@@ -125,8 +123,8 @@ public class FileTempStorageService {
         }
     }
 
-    public boolean delete(String resourceHash, AppLanguage lang) {
-        ResourceFile entity = get(resourceHash, lang);
+    public boolean delete(String resourceHash) {
+        ResourceFile entity = get(resourceHash);
         repository.deleteByResourceHashAndDeletedFalse(resourceHash);
         File file = new File(folderName + "/" + entity.getPath() + "/" + entity.getResourceHash());
         boolean b = false;
@@ -153,9 +151,9 @@ public class FileTempStorageService {
         return fileName.substring(lastIndexOf + 1);
     }
 
-    public ResourceFile get(String resourceHash, AppLanguage lang) {
+    public ResourceFile get(String resourceHash) {
         return repository.findByResourceHashAndDeletedFalse(resourceHash).orElseThrow(() -> {
-            throw new AppBadException(bundleService.getMessage("file.not.found", lang)+ " " + resourceHash);
+            throw new AppBadException(bundleService.getMessage("file.not.found") + " " + resourceHash);
         });
     }
 }

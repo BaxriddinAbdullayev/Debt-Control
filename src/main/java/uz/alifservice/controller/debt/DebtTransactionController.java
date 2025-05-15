@@ -12,7 +12,6 @@ import uz.alifservice.domain.debt.DebtTransaction;
 import uz.alifservice.dto.AppResponse;
 import uz.alifservice.dto.debt.DebtTransactionCrudDto;
 import uz.alifservice.dto.debt.DebtTransactionDto;
-import uz.alifservice.enums.AppLanguage;
 import uz.alifservice.mapper.debt.DebtTransactionMapper;
 import uz.alifservice.service.debt.DebtTransactionService;
 import uz.alifservice.service.message.ResourceBundleService;
@@ -29,58 +28,41 @@ public class DebtTransactionController implements GenericCrudController<DebtTran
     @Override
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @RequestMapping(value = "/debt-transactions/{id}", method = RequestMethod.GET)
-    public ResponseEntity<AppResponse<DebtTransactionDto>> get(
-            @PathVariable(value = "id") Long id,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        String messsage = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved", lang);
-        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.get(id, lang)), messsage));
+    public ResponseEntity<AppResponse<DebtTransactionDto>> get(@PathVariable(value = "id") Long id) {
+        String messsage = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.get(id)), messsage));
     }
 
     @Override
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @RequestMapping(value = "/debt-transactions", method = RequestMethod.GET)
-    public ResponseEntity<AppResponse<Page<DebtTransactionDto>>> list(
-            DebtTransactionCriteria criteria,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        String messsage = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved", lang);
-        return ResponseEntity.ok(AppResponse.success(service.list(criteria, lang).map(mapper::toDto), messsage));
+    public ResponseEntity<AppResponse<Page<DebtTransactionDto>>> list(DebtTransactionCriteria criteria) {
+        String messsage = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(service.list(criteria).map(mapper::toDto), messsage));
     }
 
     @Override
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @RequestMapping(value = "/debt-transactions", method = RequestMethod.POST)
-    public ResponseEntity<AppResponse<DebtTransactionDto>> create(
-            @RequestBody DebtTransactionCrudDto dto,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        String messsage = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("created", lang);
-        return new ResponseEntity<>(AppResponse.success(mapper.toDto(service.create(dto, lang)), messsage), HttpStatus.CREATED);
+    public ResponseEntity<AppResponse<DebtTransactionDto>> create(@RequestBody DebtTransactionCrudDto dto) {
+        String messsage = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("created");
+        return new ResponseEntity<>(AppResponse.success(mapper.toDto(service.create(dto)), messsage), HttpStatus.CREATED);
     }
 
     @Override
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @RequestMapping(value = "/debt-transactions/{id}", method = {RequestMethod.PUT, RequestMethod.POST})
-    public ResponseEntity<AppResponse<DebtTransactionDto>> edit(
-            @PathVariable(
-                    value = "id") Long id,
-            @RequestBody DebtTransactionCrudDto dto,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        String messsage = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("updated", lang);
-        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.update(id, dto, lang)), messsage));
+    public ResponseEntity<AppResponse<DebtTransactionDto>> edit(@PathVariable(value = "id") Long id, @RequestBody DebtTransactionCrudDto dto) {
+        String messsage = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("updated");
+        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.update(id, dto)), messsage));
     }
 
     @Override
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @RequestMapping(value = "/debt-transactions/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<AppResponse<Boolean>> delete(
-            @PathVariable(value = "id") Long id,
-            @RequestHeader(value = "Accept-Language", defaultValue = "UZ") AppLanguage lang
-    ) {
-        service.delete(id, lang);
-        String messsage = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("deleted", lang);
+    public ResponseEntity<AppResponse<Boolean>> delete(@PathVariable(value = "id") Long id) {
+        service.delete(id);
+        String messsage = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("deleted");
         return ResponseEntity.ok(AppResponse.success(true, messsage));
     }
 }

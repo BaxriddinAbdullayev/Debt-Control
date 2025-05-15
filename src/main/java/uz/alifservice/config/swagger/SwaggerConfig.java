@@ -18,7 +18,7 @@ import java.util.List;
                 description = "MY Debt Control application"
         ),
         servers = {
-                @Server(url = "http://localhost:8080", description = "Local Server"),
+                @Server(url = "http://localhost:8081", description = "Local Server"),
                 @Server(url = "http://52.87.181.142:8080", description = "{Production} Server")
         }
 //        security = @SecurityRequirement(name = "bearerAuth") // Apply globally

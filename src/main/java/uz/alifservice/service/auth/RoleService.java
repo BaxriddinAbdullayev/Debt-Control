@@ -24,34 +24,34 @@ public class RoleService implements GenericCrudService<Role, RoleCrudDto, RoleCr
 
     @Override
     @Transactional(readOnly = true)
-    public Role get(Long id, AppLanguage lang) {
+    public Role get(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.valueOf(id)));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Role> list(RoleCriteria criteria, AppLanguage lang) {
+    public Page<Role> list(RoleCriteria criteria) {
         return repository.findAll(criteria.toSpecification(),
                 PageRequest.of(criteria.getPage(), criteria.getSize(), Sort.by(criteria.getDirection(), criteria.getSort())));
     }
 
     @Override
     @Transactional
-    public Role create(RoleCrudDto dto, AppLanguage lang) {
+    public Role create(RoleCrudDto dto) {
         return repository.save(mapper.fromCreateDto(dto));
     }
 
     @Override
     @Transactional
-    public Role update(Long id, RoleCrudDto dto, AppLanguage lang) {
-        Role entity = get(id, lang);
+    public Role update(Long id, RoleCrudDto dto) {
+        Role entity = get(id);
         return repository.save(mapper.fromUpdate(dto, entity));
     }
 
     @Override
     @Transactional
-    public void delete(Long id, AppLanguage lang) {
-        Role entity = get(id, lang);
+    public void delete(Long id) {
+        Role entity = get(id);
         entity.setDeleted(true);
     }
 }

@@ -1,4 +1,4 @@
-package uz.alifservice.config.security;
+package uz.alifservice.config.filter;
 
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import uz.alifservice.config.security.SpringConfig;
 import uz.alifservice.util.JwtUtil;
 
 import java.io.IOException;
