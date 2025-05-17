@@ -21,6 +21,7 @@ public class CustomUserDetails implements UserDetails {
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
     private GeneralStatus status;
+    private User user;
 
     public CustomUserDetails(User user, Set<Role> roleList) {
         this.id = user.getId();
@@ -28,6 +29,7 @@ public class CustomUserDetails implements UserDetails {
         this.password = user.getPassword();
         this.status = user.getStatus();
         this.authorities = roleList.stream().map(item -> new SimpleGrantedAuthority(item.getRoleName())).toList();
+        this.user = user;
     }
 
     @Override

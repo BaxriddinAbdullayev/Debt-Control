@@ -29,16 +29,19 @@ public class DebtTransactionController implements GenericCrudController<DebtTran
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @RequestMapping(value = "/debt-transactions/{id}", method = RequestMethod.GET)
     public ResponseEntity<AppResponse<DebtTransactionDto>> get(@PathVariable(value = "id") Long id) {
-        String messsage = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
-        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.get(id)), messsage));
+        DebtTransaction entity = service.get(id);
+        DebtTransactionDto dto = service.convertToLocalTime(mapper.toDto(entity));
+        String message = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(dto, message));
     }
 
     @Override
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @RequestMapping(value = "/debt-transactions", method = RequestMethod.GET)
     public ResponseEntity<AppResponse<Page<DebtTransactionDto>>> list(DebtTransactionCriteria criteria) {
-        String messsage = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
-        return ResponseEntity.ok(AppResponse.success(service.list(criteria).map(mapper::toDto), messsage));
+        Page<DebtTransactionDto> dtos = service.list(criteria).map(entity -> service.convertToLocalTime(mapper.toDto(entity)));
+        String message = DebtTransaction.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(dtos, message));
     }
 
     @Override

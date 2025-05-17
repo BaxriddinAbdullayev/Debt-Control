@@ -3,10 +3,11 @@ package uz.alifservice.service.message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Service;
-import uz.alifservice.config.app.AppLanguageContext;
 import uz.alifservice.enums.AppLanguage;
 
 import java.util.Locale;
+
+import static uz.alifservice.util.LocaleUtil.getAppLanguage;
 
 @Service
 @RequiredArgsConstructor
@@ -19,12 +20,12 @@ public class ResourceBundleService {
     }
 
     public String getMessage(String code) {
-        AppLanguage lang = AppLanguageContext.get();
+        AppLanguage lang = getAppLanguage();
         return bundleMessage.getMessage(code, null, new Locale(lang.name()));
     }
 
     public String getSuccessCrudMessage(String operation) {
-        AppLanguage lang = AppLanguageContext.get();
+        AppLanguage lang = getAppLanguage();
         return getMessage("operation.success." + operation, lang);
     }
 }

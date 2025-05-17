@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import uz.alifservice.criteria.debt.DebtCriteria;
 import uz.alifservice.domain.debt.Debt;
+import uz.alifservice.enums.DebtStatus;
 import uz.alifservice.specification.GenericSpecification;
 
 import java.util.Objects;
@@ -19,6 +20,13 @@ public class DebtSpecification extends GenericSpecification<Debt> {
     @Override
     public Predicate toPredicate(Root<Debt> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         super.toPredicate(root, query, criteriaBuilder);
+
+        if (!Objects.isNull(criteria.getFullName())) {
+            predicates.add(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("fullName")),
+                            "%" + criteria.getFullName().toLowerCase() + "%")
+            );
+        }
 
         if (!Objects.isNull(criteria.getDebtRole())) {
             predicates.add(criteriaBuilder.equal(root.get("debtRole"), criteria.getDebtRole()));

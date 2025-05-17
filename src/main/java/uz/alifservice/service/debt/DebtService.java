@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.alifservice.criteria.debt.DebtCriteria;
+import uz.alifservice.domain.auth.User;
 import uz.alifservice.domain.debt.Debt;
 import uz.alifservice.dto.debt.DebtCrudDto;
 import uz.alifservice.dto.debt.DebtDto;
@@ -15,10 +16,14 @@ import uz.alifservice.dto.debt.DebtTransactionCrudDto;
 import uz.alifservice.enums.DebtAction;
 import uz.alifservice.enums.DebtRole;
 import uz.alifservice.mapper.debt.DebtMapper;
+import uz.alifservice.repository.auth.UserRepository;
 import uz.alifservice.repository.debt.DebtRepository;
 import uz.alifservice.service.GenericCrudService;
+import uz.alifservice.util.SpringSecurityUtil;
 
 import java.util.Optional;
+
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +32,7 @@ public class DebtService implements GenericCrudService<Debt, DebtCrudDto, DebtCr
     private final DebtRepository repository;
     private final DebtMapper mapper;
     private final DebtTransactionService debtTransactionService;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -44,7 +50,18 @@ public class DebtService implements GenericCrudService<Debt, DebtCrudDto, DebtCr
     @Override
     @Transactional
     public Debt create(DebtCrudDto dto) {
-        Debt debtEntity = repository.save(mapper.fromCreateDto(dto));
+        Debt debt = mapper.fromCreateDto(dto);
+        User user = SpringSecurityUtil.getCurrentUser();
+
+        if(user != null) {
+            User currentUser = userRepository.findByIdWithRoles(user.getId())
+                    .orElseThrow(() -> new EntityNotFoundException(String.valueOf(user.getId())));
+            debt.setUser(currentUser);
+        }else {
+            debt.setUser(null);
+        }
+
+        Debt debtEntity = repository.save(debt);
         DebtDto debtDto = mapper.toDto(debtEntity);
 
         DebtTransactionCrudDto transactionCrudDto = new DebtTransactionCrudDto();
@@ -76,11 +93,5 @@ public class DebtService implements GenericCrudService<Debt, DebtCrudDto, DebtCr
     public void delete(Long id) {
         Debt entity = get(id);
         entity.setDeleted(true);
-    }
-
-    public Debt getDebtById(Long id) {
-        Optional<Debt> optional = repository.findById(id);
-        if (optional.isEmpty()) throw new EntityNotFoundException(String.valueOf(id));
-        return optional.get();
     }
 }

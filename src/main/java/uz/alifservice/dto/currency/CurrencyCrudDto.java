@@ -16,7 +16,8 @@ public class CurrencyCrudDto extends GenericCrudDto {
     private String nameEn;
     private String symbol;
     private BigDecimal exchangeRate;
-    private String iconUrl;
     private boolean popular;
+    private Integer ordering;
+    private String iconUrl;
     private String baseCurrency;
 }

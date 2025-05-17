@@ -19,7 +19,8 @@ import uz.alifservice.repository.communication.sms.SmsProviderTokenHolderReposit
 import uz.alifservice.service.message.ResourceBundleService;
 import uz.alifservice.util.RandomUtil;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @Service
@@ -98,24 +99,26 @@ public class SmsSendService {
 
     private String getToken() {
         Optional<SmsProviderTokenHolder> optional = smsProviderTokenHolderRepository.findTop1By();
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"));
+
         if (optional.isEmpty()) { // if token not exists
             String token = getTokenFromProvider();
             SmsProviderTokenHolder entity = new SmsProviderTokenHolder();
             entity.setToken(token);
-            entity.setExpiredDate(LocalDateTime.now().plusMonths(1));
+            entity.setExpiredDate(now.plusMonths(1));
             smsProviderTokenHolderRepository.save(entity);
             return token;
         }
 
         // if exists check it
         SmsProviderTokenHolder entity = optional.get();
-        if (LocalDateTime.now().isBefore(entity.getExpiredDate())) { // if not expired
+        if (now.isBefore(entity.getExpiredDate())) { // if not expired
             return entity.getToken();
         }
         // get new token and update
         String token = getTokenFromProvider();
         entity.setToken(token);
-        entity.setExpiredDate(LocalDateTime.now().plusMonths(1));
+        entity.setExpiredDate(now.plusMonths(1));
         smsProviderTokenHolderRepository.save(entity);
         return token;
     }

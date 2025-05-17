@@ -17,6 +17,7 @@ public class DebtCriteria extends GenericCriteria {
 
     private DebtRole debtRole;
     private DebtStatus status;
+    private String fullName;
 
     @Builder(builderMethodName = "childBuilder")
     public DebtCriteria(Long id, Integer page, Integer size, Sort.Direction direction, String sort) {

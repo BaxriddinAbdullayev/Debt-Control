@@ -6,7 +6,7 @@ import uz.alifservice.dto.GenericCrudDto;
 import uz.alifservice.enums.DebtAction;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -15,8 +15,8 @@ public class DebtTransactionCrudDto extends GenericCrudDto {
     private DebtDto debt;
     private BigDecimal amount;
     private String description;
-    private Date issueDate;
-    private Date dueDate;
+    private ZonedDateTime issueDate;
+    private ZonedDateTime dueDate;
     private String fileHash;
     private DebtAction action;
 }

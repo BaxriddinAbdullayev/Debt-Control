@@ -11,6 +11,7 @@ import uz.alifservice.criteria.debt.DebtTransactionCriteria;
 import uz.alifservice.domain.debt.Debt;
 import uz.alifservice.domain.debt.DebtTransaction;
 import uz.alifservice.dto.debt.DebtTransactionCrudDto;
+import uz.alifservice.dto.debt.DebtTransactionDto;
 import uz.alifservice.enums.DebtRole;
 import uz.alifservice.exps.AppBadException;
 import uz.alifservice.mapper.debt.DebtTransactionMapper;
@@ -18,6 +19,7 @@ import uz.alifservice.repository.debt.DebtRepository;
 import uz.alifservice.repository.debt.DebtTransactionRepository;
 import uz.alifservice.service.GenericCrudService;
 import uz.alifservice.service.message.ResourceBundleService;
+import uz.alifservice.util.DateTimeUtil;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -53,16 +55,59 @@ public class DebtTransactionService implements GenericCrudService<DebtTransactio
         if (optional.isEmpty()) throw new EntityNotFoundException(String.valueOf(id));
 
         Debt debtEntity = optional.get();
-        DebtTransaction entity = repository.save(mapper.fromCreateDto(dto));
+        DebtTransaction entity = mapper.fromCreateDto(dto);
 
-        BigDecimal calculateTotalAmount = null;
+        // Vaqtni UTC ga aylantirish
+        if (entity.getIssueDate() != null) {
+            entity.setIssueDate(DateTimeUtil.toUTC(entity.getIssueDate()));
+        }
+        if (entity.getDueDate() != null) {
+            entity.setDueDate(DateTimeUtil.toUTC(entity.getDueDate()));
+        }
+
+        entity = repository.save(entity);
+
+        BigDecimal calculateTotalAmount = calculateDebtAmount(debtEntity, dto);
+        debtEntity.setTotalAmount(calculateTotalAmount.abs());
+        debtRepository.save(debtEntity);
+        return entity;
+    }
+
+    @Override
+    @Transactional
+    public DebtTransaction update(Long id, DebtTransactionCrudDto dto) {
+        DebtTransaction entity = get(id);
+        entity = mapper.fromUpdate(dto, entity);
+
+        // Vaqtni UTC ga aylantirish
+        if (entity.getIssueDate() != null) {
+            entity.setIssueDate(DateTimeUtil.toUTC(entity.getIssueDate()));
+        }
+        if (entity.getDueDate() != null) {
+            entity.setDueDate(DateTimeUtil.toUTC(entity.getDueDate()));
+        }
+        return repository.save(entity);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        DebtTransaction entity = get(id);
+        entity.setDeleted(true);
+    }
+
+    public DebtTransaction createDebtTransaction(DebtTransactionCrudDto dto) {
+        return repository.save(mapper.fromCreateDto(dto));
+    }
+
+    private BigDecimal calculateDebtAmount(Debt debtEntity, DebtTransactionCrudDto dto) {
+        BigDecimal calculateTotalAmount = debtEntity.getTotalAmount();
         switch (debtEntity.getDebtRole()) {
             case LEND -> {
                 switch (dto.getAction()) {
-                    case GAVE -> calculateTotalAmount = debtEntity.getTotalAmount().add(dto.getAmount());
+                    case GAVE -> calculateTotalAmount = calculateTotalAmount.add(dto.getAmount());
                     case RECEIVED -> {
-                        calculateTotalAmount = debtEntity.getTotalAmount().subtract(dto.getAmount());
-
+                        calculateTotalAmount = calculateTotalAmount.subtract(dto.getAmount());
                         if (calculateTotalAmount.compareTo(BigDecimal.ZERO) < 0) {
                             debtEntity.setDebtRole(DebtRole.BORROW);
                         }
@@ -74,10 +119,9 @@ public class DebtTransactionService implements GenericCrudService<DebtTransactio
             }
             case BORROW -> {
                 switch (dto.getAction()) {
-                    case TOOK -> calculateTotalAmount = debtEntity.getTotalAmount().add(dto.getAmount());
+                    case TOOK -> calculateTotalAmount = calculateTotalAmount.add(dto.getAmount());
                     case REPAID -> {
-                        calculateTotalAmount = debtEntity.getTotalAmount().subtract(dto.getAmount());
-
+                        calculateTotalAmount = calculateTotalAmount.subtract(dto.getAmount());
                         if (calculateTotalAmount.compareTo(BigDecimal.ZERO) < 0) {
                             debtEntity.setDebtRole(DebtRole.LEND);
                         }
@@ -92,33 +136,25 @@ public class DebtTransactionService implements GenericCrudService<DebtTransactio
                     case GAVE -> debtEntity.setDebtRole(DebtRole.LEND);
                     case TOOK -> debtEntity.setDebtRole(DebtRole.BORROW);
                 }
-                calculateTotalAmount = debtEntity.getTotalAmount().add(dto.getAmount());
+                calculateTotalAmount = calculateTotalAmount.add(dto.getAmount());
             }
-            default -> {
-                throw new AppBadException(bundleService.getMessage("status.wrong"));
-            }
+            default -> throw new AppBadException(bundleService.getMessage("status.wrong"));
         }
-
-        debtEntity.setTotalAmount(calculateTotalAmount.abs());
-        debtRepository.save(debtEntity);
-        return entity;
+        return calculateTotalAmount;
     }
 
-    @Override
-    @Transactional
-    public DebtTransaction update(Long id, DebtTransactionCrudDto dto) {
-        DebtTransaction entity = get(id);
-        return repository.save(mapper.fromUpdate(dto, entity));
-    }
+    public DebtTransactionDto convertToLocalTime(DebtTransactionDto dto) {
+        // issueDate dan vaqt mintaqasini olish, agar mavjud bo‘lmasa default Asia/Tashkent
+        String targetZoneId = (dto.getIssueDate() != null && dto.getIssueDate().getZone() != null)
+                ? dto.getIssueDate().getZone().getId()
+                : "Asia/Tashkent";
 
-    @Override
-    @Transactional
-    public void delete(Long id) {
-        DebtTransaction entity = get(id);
-        entity.setDeleted(true);
-    }
-
-    public DebtTransaction createDebtTransaction(DebtTransactionCrudDto dto) {
-        return repository.save(mapper.fromCreateDto(dto));
+        if (dto.getIssueDate() != null) {
+            dto.setIssueDate(DateTimeUtil.toLocal(dto.getIssueDate(), targetZoneId));
+        }
+        if (dto.getDueDate() != null) {
+            dto.setDueDate(DateTimeUtil.toLocal(dto.getDueDate(), targetZoneId));
+        }
+        return dto;
     }
 }

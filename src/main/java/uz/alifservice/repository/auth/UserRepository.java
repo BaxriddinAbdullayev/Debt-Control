@@ -15,6 +15,9 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.id = :id")
+    Optional<User> findByIdWithRoles(@Param(value = "id") Long id);
+
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM auth_users_roles WHERE user_id = :userId", nativeQuery = true)

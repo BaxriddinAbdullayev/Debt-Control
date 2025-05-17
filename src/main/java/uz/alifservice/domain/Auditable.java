@@ -14,7 +14,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import uz.alifservice.util.SpringSecurityUtil;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -37,11 +37,11 @@ public abstract class Auditable<U> implements Serializable {
     @CreatedDate
     @CreationTimestamp
     @Column(name = "created_at")
-    private Date createdAt;
+    private ZonedDateTime createdAt;
 
     @LastModifiedDate
     @UpdateTimestamp
-    private Date updatedAt;
+    private ZonedDateTime updatedAt;
 
     @Column(name = "is_deleted", columnDefinition = "BOOLEAN default FALSE")
     private boolean deleted;

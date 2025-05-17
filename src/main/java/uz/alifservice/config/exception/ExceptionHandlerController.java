@@ -17,6 +17,7 @@ import uz.alifservice.dto.AppResponse;
 import uz.alifservice.exps.AppBadException;
 import uz.alifservice.service.message.ResourceBundleService;
 
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +53,11 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         );
     }
 
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<AppResponse<Object>> haDateTimeParseException(DateTimeParseException ex) {
+        return new ResponseEntity<>(AppResponse.error(bundleService.getMessage("invalid.date.format")), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(AppBadException.class)
     public ResponseEntity<AppResponse<Object>> handleAppBadException(AppBadException ex) {
         return new ResponseEntity<>(AppResponse.error(ex.getMessage()), HttpStatus.BAD_REQUEST);
@@ -59,7 +65,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<AppResponse<Object>> handleGeneralException(RuntimeException ex) {
-        ex.getStackTrace();
+        ex.printStackTrace();
         return new ResponseEntity<>(
                 AppResponse.error(bundleService.getMessage("unexpected.error")),
                 HttpStatus.INTERNAL_SERVER_ERROR

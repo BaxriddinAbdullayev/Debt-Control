@@ -2,6 +2,7 @@ package uz.alifservice.util;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import uz.alifservice.config.security.CustomUserDetails;
 import uz.alifservice.domain.auth.Role;
 import uz.alifservice.domain.auth.User;
 
@@ -13,8 +14,8 @@ public class SpringSecurityUtil {
             return null;
         }
         Object principal = authentication.getPrincipal();
-        if (principal instanceof User) {
-            return (User) principal;
+        if (principal instanceof CustomUserDetails customUserDetails) {
+            return customUserDetails.getUser();
         }
         return null;
     }

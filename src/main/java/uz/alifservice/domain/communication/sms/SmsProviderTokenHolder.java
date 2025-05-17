@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import uz.alifservice.domain.Auditable;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -19,5 +19,5 @@ public class SmsProviderTokenHolder extends Auditable<Long> {
     private String token;
 
     @Column(name = "expired_date")
-    private LocalDateTime expiredDate;
+    private ZonedDateTime expiredDate;
 }

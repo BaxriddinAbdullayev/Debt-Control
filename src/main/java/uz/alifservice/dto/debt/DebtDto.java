@@ -9,7 +9,7 @@ import uz.alifservice.enums.DebtRole;
 import uz.alifservice.enums.DebtStatus;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -17,11 +17,12 @@ public class DebtDto extends GenericDto {
 
     private UserDto user;
     private String fullName;
+    private String phoneNumber;
     private BigDecimal totalAmount;
     private String description;
     private String fileHash;
-    private Date issueDate;
-    private Date dueDate;
+    private ZonedDateTime issueDate;
+    private ZonedDateTime dueDate;
     private DebtRole debtRole;
     private CurrencyDto currency;
     private DebtStatus status;

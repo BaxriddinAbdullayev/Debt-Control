@@ -7,7 +7,7 @@ import uz.alifservice.domain.Auditable;
 import uz.alifservice.enums.DebtAction;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -26,10 +26,10 @@ public class DebtTransaction extends Auditable<Long> {
     private String description;
 
     @Column(name = "issue_date")
-    private Date issueDate;
+    private ZonedDateTime issueDate;
 
     @Column(name = "due_date")
-    private Date dueDate;
+    private ZonedDateTime dueDate;
 
     @Column(name = "file_hash")
     private String fileHash;

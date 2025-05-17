@@ -24,6 +24,9 @@ public class Debt extends Auditable<Long> {
     @Column(name = "full_name")
     private String fullName;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     @Column(name = "amount", nullable = false)
     private BigDecimal totalAmount;
 

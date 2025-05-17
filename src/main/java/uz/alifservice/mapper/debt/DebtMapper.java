@@ -16,13 +16,14 @@ import uz.alifservice.mapper.currency.CurrencyMapper;
 })
 public interface DebtMapper extends BaseCrudMapper<Debt, DebtDto, DebtCrudDto> {
 
-//    @Named("toShortInfo")
-//    @Mapping(target = "id", source = "id")
-//    @Mapping(target = "user", source = "user")
-//    @Mapping(target = "fullName", source = "fullName")
-//    @Mapping(target = "totalAmount", source = "amount")
-//    @Mapping(target = "debtRole", source = "debtRole")
-//    @Mapping(target = "currency", source = "currency")
-//    @BeanMapping(ignoreByDefault = true)
-//    Debt toShortInfo(DebtCrudDto debt);
+    @Named("toFullInfo")
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "fullName", source = "fullName")
+    @Mapping(target = "phoneNumber", source = "phoneNumber")
+    @Mapping(target = "totalAmount", source = "totalAmount")
+    @Mapping(target = "debtRole", source = "debtRole")
+    @Mapping(target = "currency", source = "currency", qualifiedByName = "toFullInfo")
+    @Mapping(target = "user", source = "user", qualifiedByName = "toFullInfo")
+    @BeanMapping(ignoreByDefault = true)
+    DebtDto toFullInfo(Debt debt);
 }
