@@ -2,6 +2,7 @@ package uz.alifservice.service.debt;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -11,7 +12,6 @@ import uz.alifservice.criteria.debt.DebtTransactionCriteria;
 import uz.alifservice.domain.debt.Debt;
 import uz.alifservice.domain.debt.DebtTransaction;
 import uz.alifservice.dto.debt.DebtTransactionCrudDto;
-import uz.alifservice.dto.debt.DebtTransactionDto;
 import uz.alifservice.enums.DebtRole;
 import uz.alifservice.exps.AppBadException;
 import uz.alifservice.mapper.debt.DebtTransactionMapper;
@@ -19,7 +19,6 @@ import uz.alifservice.repository.debt.DebtRepository;
 import uz.alifservice.repository.debt.DebtTransactionRepository;
 import uz.alifservice.service.GenericCrudService;
 import uz.alifservice.service.message.ResourceBundleService;
-import uz.alifservice.util.DateTimeUtil;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -34,6 +33,9 @@ public class DebtTransactionService implements GenericCrudService<DebtTransactio
     private final DebtTransactionMapper mapper;
     private final ResourceBundleService bundleService;
     private final DebtRepository debtRepository;
+
+    @Value("${app.default-time-zone}")
+    private String defaultTimeZone;
 
     @Override
     @Transactional(readOnly = true)
@@ -55,17 +57,7 @@ public class DebtTransactionService implements GenericCrudService<DebtTransactio
         if (optional.isEmpty()) throw new EntityNotFoundException(String.valueOf(id));
 
         Debt debtEntity = optional.get();
-        DebtTransaction entity = mapper.fromCreateDto(dto);
-
-        // Vaqtni UTC ga aylantirish
-        if (entity.getIssueDate() != null) {
-            entity.setIssueDate(DateTimeUtil.toUTC(entity.getIssueDate()));
-        }
-        if (entity.getDueDate() != null) {
-            entity.setDueDate(DateTimeUtil.toUTC(entity.getDueDate()));
-        }
-
-        entity = repository.save(entity);
+        DebtTransaction entity = repository.save(mapper.fromCreateDto(dto));
 
         BigDecimal calculateTotalAmount = calculateDebtAmount(debtEntity, dto);
         debtEntity.setTotalAmount(calculateTotalAmount.abs());
@@ -77,16 +69,7 @@ public class DebtTransactionService implements GenericCrudService<DebtTransactio
     @Transactional
     public DebtTransaction update(Long id, DebtTransactionCrudDto dto) {
         DebtTransaction entity = get(id);
-        entity = mapper.fromUpdate(dto, entity);
-
-        // Vaqtni UTC ga aylantirish
-        if (entity.getIssueDate() != null) {
-            entity.setIssueDate(DateTimeUtil.toUTC(entity.getIssueDate()));
-        }
-        if (entity.getDueDate() != null) {
-            entity.setDueDate(DateTimeUtil.toUTC(entity.getDueDate()));
-        }
-        return repository.save(entity);
+        return repository.save(mapper.fromUpdate(dto, entity));
     }
 
     @Override
@@ -115,6 +98,7 @@ public class DebtTransactionService implements GenericCrudService<DebtTransactio
                             debtEntity.setDebtRole(DebtRole.DEBT_PAID_OFF);
                         }
                     }
+                    // todo default boshqa status kelishi mumkin. masalan took default yozish kerak
                 }
             }
             case BORROW -> {
@@ -129,32 +113,19 @@ public class DebtTransactionService implements GenericCrudService<DebtTransactio
                             debtEntity.setDebtRole(DebtRole.DEBT_PAID_OFF);
                         }
                     }
+                    // todo default boshqa status kelishi mumkin. masalan took default yozish kerak
                 }
             }
             case DEBT_PAID_OFF -> {
                 switch (dto.getAction()) {
                     case GAVE -> debtEntity.setDebtRole(DebtRole.LEND);
                     case TOOK -> debtEntity.setDebtRole(DebtRole.BORROW);
+                    // todo default boshqa status kelishi mumkin. masalan took default yozish kerak
                 }
                 calculateTotalAmount = calculateTotalAmount.add(dto.getAmount());
             }
             default -> throw new AppBadException(bundleService.getMessage("status.wrong"));
         }
         return calculateTotalAmount;
-    }
-
-    public DebtTransactionDto convertToLocalTime(DebtTransactionDto dto) {
-        // issueDate dan vaqt mintaqasini olish, agar mavjud bo‘lmasa default Asia/Tashkent
-        String targetZoneId = (dto.getIssueDate() != null && dto.getIssueDate().getZone() != null)
-                ? dto.getIssueDate().getZone().getId()
-                : "Asia/Tashkent";
-
-        if (dto.getIssueDate() != null) {
-            dto.setIssueDate(DateTimeUtil.toLocal(dto.getIssueDate(), targetZoneId));
-        }
-        if (dto.getDueDate() != null) {
-            dto.setDueDate(DateTimeUtil.toLocal(dto.getDueDate(), targetZoneId));
-        }
-        return dto;
     }
 }

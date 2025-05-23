@@ -29,32 +29,32 @@ public class RoleController implements GenericCrudController<RoleDto, RoleCrudDt
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/roles/{id}", method = RequestMethod.GET)
     public ResponseEntity<AppResponse<RoleDto>> get(@PathVariable(value = "id") Long id) {
-        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
-        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.get(id)), messsage));
+        String message = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.get(id)), message));
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/roles", method = RequestMethod.GET)
     public ResponseEntity<AppResponse<Page<RoleDto>>> list(RoleCriteria criteria) {
-        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
-        return ResponseEntity.ok(AppResponse.success(service.list(criteria).map(mapper::toDto), messsage));
+        String message = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(service.list(criteria).map(mapper::toDto), message));
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/roles", method = RequestMethod.POST)
     public ResponseEntity<AppResponse<RoleDto>> create(@RequestBody RoleCrudDto dto) {
-        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("created");
-        return new ResponseEntity<>(AppResponse.success(mapper.toDto(service.create(dto)), messsage), HttpStatus.CREATED);
+        String message = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("created");
+        return new ResponseEntity<>(AppResponse.success(mapper.toDto(service.create(dto)), message), HttpStatus.CREATED);
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/roles/{id}", method = {RequestMethod.PUT, RequestMethod.POST})
     public ResponseEntity<AppResponse<RoleDto>> edit(@PathVariable(value = "id") Long id, @RequestBody RoleCrudDto dto) {
-        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("updated");
-        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.update(id, dto)), messsage));
+        String message = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("updated");
+        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.update(id, dto)), message));
     }
 
     @Override
@@ -62,7 +62,7 @@ public class RoleController implements GenericCrudController<RoleDto, RoleCrudDt
     @RequestMapping(value = "/roles/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<AppResponse<Boolean>> delete(@PathVariable(value = "id") Long id) {
         service.delete(id);
-        String messsage = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("deleted");
-        return ResponseEntity.ok(AppResponse.success(true, messsage));
+        String message = Role.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("deleted");
+        return ResponseEntity.ok(AppResponse.success(true, message));
     }
 }

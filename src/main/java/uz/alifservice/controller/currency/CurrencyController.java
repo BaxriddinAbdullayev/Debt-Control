@@ -29,32 +29,32 @@ public class CurrencyController implements GenericCrudController<CurrencyDto, Cu
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @RequestMapping(value = "/currencies/{id}", method = RequestMethod.GET)
     public ResponseEntity<AppResponse<CurrencyDto>> get(@PathVariable(value = "id") Long id) {
-        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
-        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.get(id)), messsage));
+        String message = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.get(id)), message));
     }
 
     @Override
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @RequestMapping(value = "/currencies", method = RequestMethod.GET)
     public ResponseEntity<AppResponse<Page<CurrencyDto>>> list(CurrencyCriteria criteria) {
-        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
-        return ResponseEntity.ok(AppResponse.success(service.list(criteria).map(mapper::toDto), messsage));
+        String message = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(service.list(criteria).map(mapper::toDto), message));
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/currencies", method = RequestMethod.POST)
     public ResponseEntity<AppResponse<CurrencyDto>> create(@RequestBody CurrencyCrudDto dto) {
-        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("created");
-        return new ResponseEntity<>(AppResponse.success(mapper.toDto(service.create(dto)), messsage), HttpStatus.CREATED);
+        String message = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("created");
+        return new ResponseEntity<>(AppResponse.success(mapper.toDto(service.create(dto)), message), HttpStatus.CREATED);
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value = "/currencies/{id}", method = {RequestMethod.PUT, RequestMethod.POST})
     public ResponseEntity<AppResponse<CurrencyDto>> edit(@PathVariable(value = "id") Long id, @RequestBody CurrencyCrudDto dto) {
-        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("updated");
-        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.update(id, dto)), messsage));
+        String message = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("updated");
+        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.update(id, dto)), message));
     }
 
     @Override
@@ -62,7 +62,7 @@ public class CurrencyController implements GenericCrudController<CurrencyDto, Cu
     @RequestMapping(value = "/currencies/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<AppResponse<Boolean>> delete(@PathVariable(value = "id") Long id) {
         service.delete(id);
-        String messsage = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("deleted");
-        return ResponseEntity.ok(AppResponse.success(true, messsage));
+        String message = Currency.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("deleted");
+        return ResponseEntity.ok(AppResponse.success(true, message));
     }
 }

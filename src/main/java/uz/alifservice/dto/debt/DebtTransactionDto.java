@@ -17,6 +17,8 @@ public class DebtTransactionDto extends GenericDto {
     private String description;
     private ZonedDateTime issueDate;
     private ZonedDateTime dueDate;
+    private ZonedDateTime createdAt;
+    private ZonedDateTime updatedAt;
     private String fileHash;
     private DebtAction action;
 }

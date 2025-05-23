@@ -28,15 +28,15 @@ public class ResourceFileController implements GenericController<ResourceFileDto
     @Override
     @RequestMapping(value = "/file/resource-file/{id}", method = RequestMethod.GET)
     public ResponseEntity<AppResponse<ResourceFileDto>> get(@PathVariable(value = "id") Long id) {
-        String messsage = ResourceFile.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
-        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.get(id)), messsage));
+        String message = ResourceFile.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(mapper.toDto(service.get(id)), message));
     }
 
     @Override
     @RequestMapping(value = "/file/resource-file", method = RequestMethod.GET)
     public ResponseEntity<AppResponse<Page<ResourceFileDto>>> list(ResourceFileCriteria criteria) {
-        String messsage = ResourceFile.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
-        return ResponseEntity.ok(AppResponse.success(service.list(criteria).map(mapper::toDto), messsage));
+        String message = ResourceFile.class.getSimpleName() + " " + bundleService.getSuccessCrudMessage("retrieved");
+        return ResponseEntity.ok(AppResponse.success(service.list(criteria).map(mapper::toDto), message));
     }
 
 

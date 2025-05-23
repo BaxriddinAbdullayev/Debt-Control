@@ -8,8 +8,9 @@ import uz.alifservice.enums.DeviceType;
 @Getter
 @Setter
 @AllArgsConstructor
-public class DeviceInfo {
+public class RequestContextInfo {
 
     private DeviceType deviceType;
     private String appVersion;
+    private String timezone;
 }

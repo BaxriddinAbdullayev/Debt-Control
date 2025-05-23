@@ -7,7 +7,7 @@ import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
-import uz.alifservice.config.interceptor.DeviceInterceptor;
+import uz.alifservice.config.interceptor.RequestContextInterceptor;
 
 import java.util.Locale;
 
@@ -15,7 +15,7 @@ import java.util.Locale;
 @AllArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    private final DeviceInterceptor deviceInterceptor;
+    private final RequestContextInterceptor requestContextInterceptor;
 
     @Bean
     public LocaleResolver localeResolver() {
@@ -26,7 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(deviceInterceptor);
+        registry.addInterceptor(requestContextInterceptor);
     }
 }
 
